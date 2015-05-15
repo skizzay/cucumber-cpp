@@ -1,5 +1,22 @@
 cmake_minimum_required(VERSION 2.8)
 
+if (BIICODE)
+    #LIST(REMOVE_ITEM BII_LIB_SRC "src/drivers/BoostDriver.cpp" "src/drivers/CppSpecDriver.cpp")
+MESSAGE("BII_LIB_SRC is ${BII_LIB_SRC}")
+    ADD_BII_TARGETS()
+    SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+    include(biicode/boost/setup)
+    SET(Boost_USE_STATIC_LIBS ON)
+    bii_find_boost(COMPONENTS thread system regex date_time REQUIRED)
+    target_include_directories(${BII_BLOCK_TARGET} INTERFACE ${Boost_INCLUDE_DIRS})
+    target_link_libraries(${BII_BLOCK_TARGET} INTERFACE ${Boost_LIBRARIES})
+    if (NOT MSVC)
+        target_link_libraries(${BII_BLOCK_TARGET} INTERFACE pthread)
+    endif()
+    RETURN()
+endif()
+
 project(Cucumber-Cpp)
 
 set(CUKE_USE_STATIC_BOOST ${MSVC} CACHE BOOL "Statically link Boost (except boost::test)")
