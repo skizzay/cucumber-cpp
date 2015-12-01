@@ -8,7 +8,7 @@ namespace internal {
 
 class ScenarioCommand : public WireCommand {
 protected:
-    std::auto_ptr<const CukeEngine::tags_type> tags;
+    std::unique_ptr<const CukeEngine::tags_type> tags;
 
     ScenarioCommand(const CukeEngine::tags_type *tags);
 };
@@ -44,8 +44,8 @@ public:
 class InvokeCommand : public WireCommand {
 private:
     const std::string stepId;
-    std::auto_ptr<const CukeEngine::invoke_args_type> args;
-    std::auto_ptr<const CukeEngine::invoke_table_type> tableArg;
+    std::unique_ptr<const CukeEngine::invoke_args_type> args;
+    std::unique_ptr<const CukeEngine::invoke_table_type> tableArg;
 
 public:
     InvokeCommand(const std::string & stepId,
