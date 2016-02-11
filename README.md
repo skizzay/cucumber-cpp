@@ -1,6 +1,8 @@
 # Cucumber-CPP
 
-[![Build Status](https://travis-ci.org/cucumber/cucumber-cpp.png)](https://travis-ci.org/cucumber/cucumber-cpp)
+[![Join the chat at https://gitter.im/cucumber/cucumber-cpp](https://badges.gitter.im/cucumber/cucumber-cpp.svg)](https://gitter.im/cucumber/cucumber-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Build Status](https://travis-ci.org/cucumber/cucumber-cpp.svg)](https://travis-ci.org/cucumber/cucumber-cpp)
 
 Cucumber-Cpp allows Cucumber to support step definitions written in C++.
 
@@ -18,12 +20,12 @@ It relies on a few libraries:
 * [Boost](http://www.boost.org/) 1.40 or later.
   Required libraries: *thread*, *system*, *regex*, and *date_time*.
   Optional library for Boost Test driver: *test*.
-* [GTest](http://code.google.com/p/googletest/) 1.4 or later.
-  Optional for the GTest driver.
+* [GTest](http://code.google.com/p/googletest/) 1.6 or later.
+  Optional for the GTest driver. By default downloaded and built by CMake.
 * [CppSpec](https://github.com/tpuronen/cppspec) development branch. 
   Optional for the CppSpec driver.
 * [GMock](http://code.google.com/p/googlemock/) 1.6 or later.
-  Optional for the internal test suite.
+  Optional for the internal test suite. By default downloaded and built by CMake.
 * [Qt 4](http://qt-project.org/). Optional for the CalcQt example.
 
 This header-only library is included in the source code:
