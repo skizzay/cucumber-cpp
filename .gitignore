@@ -1,5 +1,7 @@
-# Qt Creator
+# Editor/IDE temporary files
 CMakeLists.txt.user
+.*.swp
+*~
 
 # Bundler
 Gemfile.lock
@@ -10,3 +12,5 @@ Gemfile.lock
 
 # Build artifacts
 build/
+Debug
+Release
