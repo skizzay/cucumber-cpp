@@ -10,7 +10,3 @@ Gemfile.lock
 
 # Build artifacts
 build/
-bii/
-
-.*.sw?
-*~
