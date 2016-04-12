@@ -172,36 +172,34 @@ EOF
   end
 
   def assert_world_variable_held_value_at_time(value, time)
-    check_exact_file_content "#{WORLD_VARIABLE_LOG_FILE}.#{time}", value
+    expect("#{WORLD_VARIABLE_LOG_FILE}.#{time}").to have_file_content(value)
   end
 
   def assert_world_function_called
-    check_file_presence [WORLD_FUNCTION_LOG_FILE], true
+    expect(WORLD_FUNCTION_LOG_FILE).to be_an_existing_file
   end
 
   def assert_cycle_sequence *args
     expected_string = args.join CYCLE_SEQUENCE_SEPARATOR
-    check_file_content(CYCLE_LOG_FILE, expected_string, true)
+    expect(CYCLE_LOG_FILE).to have_file_content(Regexp.new expected_string)
   end
 
   def assert_cycle_sequence_excluding *args
     args.each do |unexpected_string|
-      check_file_content(CYCLE_LOG_FILE, unexpected_string, false)
+      expect(CYCLE_LOG_FILE).not_to have_file_content(unexpected_string)
     end
   end
 
   def assert_complete_cycle_sequence *args
     expected_string = "#{CYCLE_SEQUENCE_SEPARATOR}#{args.join(CYCLE_SEQUENCE_SEPARATOR)}"
-    check_exact_file_content(CYCLE_LOG_FILE, expected_string)
+    expect(CYCLE_LOG_FILE).to have_file_content(expected_string)
   end
 
   def assert_data_table_equals_json(json)
-    prep_for_fs_check do
-      log_file_contents = IO.read(DATA_TABLE_LOG_FILE)
-      actual_array      = JSON.parse(log_file_contents)
-      expected_array    = JSON.parse(json)
-      actual_array.should == expected_array
-    end
+    log_file_contents = IO.read(DATA_TABLE_LOG_FILE)
+    actual_array      = JSON.parse(log_file_contents)
+    expected_array    = JSON.parse(json)
+    expect(actual_array).to be == expected_array
   end
 
   def run_feature
@@ -233,7 +231,7 @@ EOF
   def append_support_code(code)
     helper_functions = get_absolute_path('../support/HelperFunctions.hpp');
     @support_code ||= <<-EOF
-#include <cucumber-cpp/defs.hpp>
+#include <cucumber-cpp/generic.hpp>
 #include "#{helper_functions}"
 
 using cucumber::ScenarioScope;
@@ -252,8 +250,10 @@ EOF
   TMP_DIR                      = ENV["TMP_DIR"]
   FEATURES_DIR                 = ENV["TEST_FEATURES_DIR"]
   STEP_DEFINITIONS_SRC         = ENV["DYNAMIC_CPP_STEPS_SRC"]
+  STEP_DEFINITIONS_OBJ         = ENV["DYNAMIC_CPP_STEPS_OBJ"]
   STEP_DEFINITIONS_EXE         = ENV["DYNAMIC_CPP_STEPS_EXE"]
   COMPILE_STEP_DEFINITIONS_CMD = ENV["COMPILE_DYNAMIC_CPP_STEPS"]
+  CUCUMBER_RUBY                = ENV["CUCUMBER_RUBY"]
 
   WORLD_VARIABLE_LOG_FILE      = "#{TMP_DIR}/world_variable.log"
   WORLD_FUNCTION_LOG_FILE      = "#{TMP_DIR}/world_function.log"
@@ -292,17 +292,21 @@ EOF
     create_wire_file
     run_cucumber_cpp
     run_cucumber_test_feature params
-    Process.kill(:SIGTERM, @steps_out.pid) # for when there are no scenarios
-    Process.wait @steps_out.pid
   end
 
   def write_main_step_definitions_file
-    write_file(STEP_DEFINITIONS_SRC, @support_code);
+    write_file STEP_DEFINITIONS_SRC, @support_code
   end
 
   def compile_step_definitions
+    remove_step_definition_obj
     compiler_output = %x[ #{COMPILE_STEP_DEFINITIONS_CMD} ]
-    expect($?.success?).to be_true, "Compilation failed!\n#{compiler_output}"
+    expect($?.success?).to be == true, "Compilation failed!\n#{compiler_output}"
+  end
+
+  def remove_step_definition_obj
+    remove STEP_DEFINITIONS_OBJ
+  rescue Errno::ENOENT
   end
 
   def create_wire_file
@@ -317,7 +321,7 @@ EOF
   end
 
   def run_cucumber_test_feature(params)
-    run_simple "cucumber #{params} #{FEATURES_DIR}", false
+    run_simple "#{CUCUMBER_RUBY} #{params} #{FEATURES_DIR}", false
   end
 end
 

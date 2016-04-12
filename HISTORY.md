@@ -8,6 +8,19 @@ None yet
 
 None yet
 
+## [0.3.1](https://github.com/cucumber/cucumber-cpp/compare/v0.3...v0.3.1) (11 April 2016)
+
+### New Features
+
+* Support for Boost 1.60 ([#101](https://github.com/cucumber/cucumber-cpp/pull/101) Kai Unger)
+* Support for CMake inclusion in other projects ([#76](https://github.com/cucumber/cucumber-cpp/pull/76) Eric Brayet)
+* Added Qt5 support in CalcQt example ([#98](https://github.com/cucumber/cucumber-cpp/pull/98) Kamil Strzempowicz)
+* Improved Generic Driver to write steps without testing framework ([#99](https://github.com/cucumber/cucumber-cpp/pull/99) Kamil Strzempowicz)
+
+### Bugfixes
+
+None
+
 ## [0.3](https://github.com/cucumber/cucumber-cpp/compare/v0.2...v0.3) (22 December 2013)
 
 ### New Features
