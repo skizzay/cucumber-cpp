@@ -2,6 +2,11 @@
 #define CUKE_WIREPROTOCOL_COMMANDS_HPP_
 
 #include "WireProtocol.hpp"
+#include <memory>
+
+#if __cplusplus < 201103L
+#  define unique_ptr auto_ptr
+#endif
 
 namespace cucumber {
 namespace internal {

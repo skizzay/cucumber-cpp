@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 #include <boost/assign/list_of.hpp>
 
+#include <memory>
 #include <typeinfo>
 
 using namespace cucumber::internal;
@@ -11,6 +12,10 @@ using namespace std;
 using namespace testing;
 
 using boost::assign::list_of;
+
+#if __cplusplus < 201103L
+#  define unique_ptr auto_ptr
+#endif
 
 class MockCukeEngine : public CukeEngine {
 public:
@@ -34,15 +39,15 @@ public:
     WireMessageCodecTest() {};
 
 protected:
-    auto_ptr<WireCommand> commandAutoPtr;
+    unique_ptr<WireCommand> commandAutoPtr;
 
     WireCommand *decode(const char *jsonStr) {
-        commandAutoPtr = auto_ptr<WireCommand>(codec.decode(jsonStr));
+        commandAutoPtr = unique_ptr<WireCommand>(codec.decode(jsonStr));
         return commandAutoPtr.get();
     }
 
     const std::string encode(WireResponse *response) {
-        auto_ptr<WireResponse> responseAutoPtr(response);
+        unique_ptr<WireResponse> responseAutoPtr(response);
         return codec.encode(responseAutoPtr.get());
     }
 
@@ -271,7 +276,7 @@ TEST(WireCommandsTest, succesfulInvokeReturnsSuccess) {
     EXPECT_CALL(engine, invokeStep(_, _, _))
             .Times(1);
 
-    auto_ptr<const WireResponse> response(invokeCommand.run(&engine));
+    unique_ptr<const WireResponse> response(invokeCommand.run(&engine));
     EXPECT_PTRTYPE(SuccessResponse, response.get());
 }
 
@@ -282,7 +287,7 @@ TEST(WireCommandsTest, throwingFailureInvokeReturnsFailure) {
             .Times(1)
             .WillOnce(Throw(InvokeFailureException("A", "B")));
 
-    auto_ptr<const WireResponse> response(invokeCommand.run(&engine));
+    unique_ptr<const WireResponse> response(invokeCommand.run(&engine));
     EXPECT_PTRTYPE(FailureResponse, response.get());
     // TODO Test A and B
 }
@@ -294,7 +299,7 @@ TEST(WireCommandsTest, throwingPendingStepReturnsPending) {
             .Times(1)
             .WillOnce(Throw(PendingStepException("S")));
 
-    auto_ptr<const WireResponse> response(invokeCommand.run(&engine));
+    unique_ptr<const WireResponse> response(invokeCommand.run(&engine));
     EXPECT_PTRTYPE(PendingResponse, response.get());
     // TODO Test S
 }
@@ -306,7 +311,7 @@ TEST(WireCommandsTest, throwingAnythingInvokeReturnsFailure) {
             .Times(1)
             .WillOnce(Throw(string("something")));
 
-    auto_ptr<const WireResponse> response(invokeCommand.run(&engine));
+    unique_ptr<const WireResponse> response(invokeCommand.run(&engine));
     EXPECT_PTRTYPE(FailureResponse, response.get());
     // TODO Test empty
 }

@@ -1,0 +1,9 @@
+PROJECT(find_cucumber_tests)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+
+INCLUDE(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+CONAN_BASIC_SETUP()
+
+ADD_EXECUTABLE(find_cucumber_tests main.cpp)
+TARGET_INCLUDE_DIRECTORIES(find_cucumber_tests INTERFACE ${CONAN_INCLUDE_DIRS})
+TARGET_LINK_LIBRARIES(find_cucumber_tests ${CONAN_LIBS})

@@ -1,6 +1,6 @@
 # Editor/IDE temporary files
 CMakeLists.txt.user
-.*.swp
+.*.sw?
 *~
 
 # Bundler
@@ -12,6 +12,4 @@ Gemfile.lock
 
 # Build artifacts
 build/
-
-# vim swap files
-*.swp
+conanfile.pyc

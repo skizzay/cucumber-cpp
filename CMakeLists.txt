@@ -14,7 +14,13 @@ set(CUKE_ENABLE_EXAMPLES OFF CACHE BOOL "Enable the examples")
 set(GMOCK_DIR "" CACHE STRING "Google Mock framework sources path (otherwise downloaded)")
 set(GMOCK_VER "1.7.0" CACHE STRING "Google Mock framework version to be used")
 
+set(CUKE_CONAN_BUILD OFF CACHE BOOL "Set by conan package manager during build configuration")
+
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/modules)
+
+if(CUKE_CONAN_BUILD)
+    include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+endif()
 
 #
 # Generic Compiler Flags
@@ -61,14 +67,25 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBOOST_ALL_DYN_LINK")
 endif()
 
-set(Boost_USE_STATIC_RUNTIME OFF)
-if(CUKE_STATIC_BOOST_LIBS)
-    set(Boost_USE_STATIC_LIBS ON)
-    find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${CUKE_STATIC_BOOST_LIBS})
-endif()
-if(CUKE_DYNAMIC_BOOST_LIBS)
-    set(Boost_USE_STATIC_LIBS OFF)
-    find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${CUKE_DYNAMIC_BOOST_LIBS})
+if(CUKE_CONAN_BUILD)
+    set(Boost_FOUND ON)
+    set(Boost_INCLUDE_DIRS ${CONAN_INCLUDE_DIRS_BOOST})
+    # TODO: Determine what works on Windows
+    set(Boost_THREAD_LIBRARY boost_thread)
+    set(Boost_SYSTEM_LIBRARY boost_system)
+    set(Boost_REGEX_LIBRARY boost_regex)
+    set(Boost_DATE_TIME_LIBRARY boost_date_time)
+    set(Boost_PROGRAM_OPTIONS_LIBRARY boost_program_options)
+else()
+    set(Boost_USE_STATIC_RUNTIME OFF)
+    if(CUKE_STATIC_BOOST_LIBS)
+        set(Boost_USE_STATIC_LIBS ON)
+        find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${CUKE_STATIC_BOOST_LIBS})
+    endif()
+    if(CUKE_DYNAMIC_BOOST_LIBS)
+        set(Boost_USE_STATIC_LIBS OFF)
+        find_package(Boost ${BOOST_MIN_VERSION} COMPONENTS ${CUKE_DYNAMIC_BOOST_LIBS})
+    endif()
 endif()
 
 if(Boost_FOUND)
@@ -90,19 +107,24 @@ endif()
 
 if(NOT CUKE_DISABLE_GTEST)
     set(GTEST_USE_STATIC_LIBS ${CUKE_USE_STATIC_GTEST})
-    set(GMOCK_ROOT "${CMAKE_CURRENT_BINARY_DIR}/gmock")
-    find_package(GMock REQUIRED)
+    if(CUKE_CONAN_BUILD)
+        set(GMOCK_FOUND ON)
+        set(GTEST_INCLUDE_DIRS ${CONAN_INCLUDE_DIRS_GTEST})
+    else()
+        set(GMOCK_ROOT "${CMAKE_CURRENT_BINARY_DIR}/gmock")
+        find_package(GMock REQUIRED)
 
-    if(GMOCK_FOUND)
-        set(CUKE_GTEST_LIBRARIES
-            ${GTEST_BOTH_LIBRARIES}
-            ${CMAKE_THREAD_LIBS_INIT}
-        )
-        set(CUKE_GMOCK_LIBRARIES
-            ${GTEST_BOTH_LIBRARIES}
-            ${GMOCK_BOTH_LIBRARIES}
-            ${CMAKE_THREAD_LIBS_INIT}
-        )
+        if(GMOCK_FOUND)
+            set(CUKE_GTEST_LIBRARIES
+                ${GTEST_BOTH_LIBRARIES}
+                ${CMAKE_THREAD_LIBS_INIT}
+            )
+            set(CUKE_GMOCK_LIBRARIES
+                ${GTEST_BOTH_LIBRARIES}
+                ${GMOCK_BOTH_LIBRARIES}
+                ${CMAKE_THREAD_LIBS_INIT}
+            )
+        endif()
     endif()
 endif()
 
