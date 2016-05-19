@@ -25,7 +25,7 @@ class CucumberCppConan(ConanFile):
         }
     _default_cmake_flags = ["", "CUKE_CONAN_BUILD=ON", "CUKE_DISABLE_E2E_TESTS=ON", "CUKE_DISABLE_UNIT_TESTS=ON", "CUKE_ENABLE_EXAMPLES=OFF"]
 
-    def requirements(self):
+    def config(self):
         self.options["Boost"].shared = self.options.shared
         if (self.options.framework == "gtest"):
             self.requires("gtest/%s@lasote/stable" % self._gtest_version)
@@ -42,8 +42,6 @@ class CucumberCppConan(ConanFile):
 
     def package_info(self):
         if self.settings.compiler == "gcc":
-            if self.settings.build_type == "Debug":
-                self.cpp_info.cppflags.append("-Weffc++")
             self.cpp_info.exelinkflags += ['-Xlinker', '--no-as-needed']
         elif self.settings.compiler == "Visual Studio":
             self.cpp_info.defines.append("NOMINMAX")
